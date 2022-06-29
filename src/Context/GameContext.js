@@ -6,6 +6,7 @@ const GameContextProvider = props => {
   
   const[gameState, setGameState] = useState({
     board: ['-', '-', '-','-', '-', '-','-', '-', '-'],
+    gameType: '',
     firstPlayerSymbol: '',
     secondPlayerSymbol: '',
   })

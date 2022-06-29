@@ -1,0 +1,28 @@
+table {
+  border-collapse: collapse;
+  opacity: 1;
+}
+
+.tile {
+  width: 150px;
+  height: 150px;
+}
+
+.tile:hover {
+  cursor: pointer;
+  background-color: #fff7c1;
+  ;
+}
+
+.left {
+  border-right: 5px solid #283618;
+}
+
+.right {
+  border-left: 5px solid #283618;
+}
+
+#second-row td {
+  border-top: 5px solid #283618;
+  border-bottom: 5px solid #283618;
+}
