@@ -1,9 +1,11 @@
 import './App.css';
-import ButtonSection from './Component/ButtonsSection/ButtonSection';
+import ButtonSelection from './Component/ButtonsSelection/ButtonsSelection';
 import Board from './Component/Board/Board';
 import GameContextProvider from './Context/GameContext';
 
 function App() {
+
+  console.log('app');
 
   
   return (
@@ -13,7 +15,7 @@ function App() {
           <h1>Tic Tac Bot</h1>
         </header>
         <div>
-          <ButtonSection/>
+          <ButtonSelection/>
         </div>
         <Board/>
       </GameContextProvider>

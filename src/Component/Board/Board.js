@@ -3,8 +3,10 @@ import Tile from '../Tile/Tile';
 import { GameContext } from '../../Context/GameContext';
 import './Board.css';
 
-export default function Board() {
+export default React.memo(function Board() {
   const gameContext = useContext(GameContext);
+
+  console.log('board');
 
   return (
     <table className='board'>
@@ -54,4 +56,4 @@ export default function Board() {
       </tbody>
     </table>
   );
-}
+})
