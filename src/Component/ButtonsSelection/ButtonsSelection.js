@@ -1,4 +1,4 @@
-import React, { useState, useRef, memo } from 'react';
+import React, { useState, useRef, memo, useEffect } from 'react';
 import './ButtonsSelection.css';
 
 export default memo(function Button(props) {
@@ -14,33 +14,71 @@ export default memo(function Button(props) {
   const [btnState, setBtnState] = useState(initialButtonState);
 
   const gameParameterSelection = (event) => {
-    const newGameState = { ...props.settings };
     if (event.target.name === 'players') {
-      if (event.target.id === 'bntOne') {
-        props.setSettings(modifyGameType(newGameState, '1 player'));
-      } else {
-        props.setSettings(modifyGameType(newGameState, '2 player'));
-      }
-      switchButtonsToSymbol();
+      determineGameType(event);
     } else {
-      if (event.target.id === 'bntOne') {
-        props.setSettings(modifyGameSymbols(newGameState, 'X', 'O'));
-      } else {
-        props.setSettings(modifyGameSymbols(newGameState, 'O', 'X'));
-      }
-      hideButtons();
+      determineSymbols(event);
     }
   };
 
-  const modifyGameType = (newGameState, value) => {
-    newGameState.gameType = value;
-    return newGameState;
+  const determineGameType = (event) => {
+    const newSettingState = { ...props.settings };
+    if (event.target.id === 'bntOne') {
+      const firstPlayer = randomNumber(); //0 is user, 1 is IA
+      props.setSettings(
+        modifyGameType(newSettingState, '1 player', firstPlayer)
+      );
+    } else {
+      props.setSettings(modifyGameType(newSettingState, '2 player'));
+    }
+    switchButtonsToSymbol();
   };
 
-  const modifyGameSymbols = (newGameState, firstSymbol, secondSymbol) => {
-    newGameState.playerOneSymbol = firstSymbol;
-    newGameState.playerTwoSymbol = secondSymbol;
-    return newGameState;
+  // If first player is IA, choose random symbols for both player
+  useEffect(() => {
+    if (props.settings.firstPlayer === 1) {
+      determineRandomSymbols();
+    }
+  }, [props.settings.firstPlayer]);
+
+  const determineSymbols = (event) => {
+    const newSettingState = { ...props.settings };
+    if (event.target.id === 'bntOne') {
+      props.setSettings(modifyGameSymbols(newSettingState, 'X', 'O'));
+    } else {
+      props.setSettings(modifyGameSymbols(newSettingState, 'O', 'X'));
+    }
+    hideButtons();
+  };
+
+  const determineRandomSymbols = () => {
+    const newSettingState = { ...props.settings };
+    const playerOneSymbol = randomNumber(); //0 X, 1 O
+    if (playerOneSymbol === 0) {
+      props.setSettings(modifyGameSymbols(newSettingState, 'X', 'O'));
+    } else {
+      props.setSettings(modifyGameSymbols(newSettingState, 'O', 'X'));
+    }
+    hideButtons();
+  };
+
+  const modifyGameType = (newSettingState, value, firstPlayer) => {
+    newSettingState.gameType = value;
+    if (firstPlayer === 1) {
+      newSettingState.firstPlayer = firstPlayer;
+    }
+    console.log(newSettingState);
+    return newSettingState;
+  };
+
+  const randomNumber = () => {
+    return Math.floor(Math.random() * 2);
+  };
+
+  const modifyGameSymbols = (newSettingState, firstSymbol, secondSymbol) => {
+    newSettingState.playerOneSymbol = firstSymbol;
+    newSettingState.playerTwoSymbol = secondSymbol;
+    return newSettingState;
   };
 
   const switchButtonsToSymbol = () => {
