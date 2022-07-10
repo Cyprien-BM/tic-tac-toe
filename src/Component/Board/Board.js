@@ -1,4 +1,4 @@
-import React, { useContext, useEffect } from 'react';
+import React, { useContext, useEffect, useState } from 'react';
 import Tile from '../Tile/Tile';
 import { GameSettingContext } from '../../Context/GameSettingContext';
 import './Board.css';
@@ -13,51 +13,53 @@ export default React.memo(function Board() {
       const newGameState = {
         ...gameContext.gameState,
         playerTurn: gameContext.settingState.firstPlayer,
-        gameStart: true,
+        gameStarted: true,
       };
       gameContext.setGameState(newGameState);
     }
   }, [gameContext.settingState]);
 
   // Determine IA Move
+  let corner = [0, 2, 6, 8]; // Index of all board corner
   useEffect(() => {
-    let firstMove = 0;
     if (
       gameContext.settingState.gameType === '1 player' &&
       gameContext.gameState.playerTurn === 1
     ) {
       if (gameContext.gameState.gameTurn === 1) {
         // if first : play on a random corner
-        let corner = [0, 2, 6, 8]; // Index of all board corner
-        firstMove = Math.floor(Math.random() * corner.length);
-        console.log(firstMove);
-        playOnBoard(corner[firstMove]);
+        playOnBoard(corner[Math.floor(Math.random() * corner.length)]);
         return;
       } else if (
-        // if second : play on center if possible or a corner
+        // if second : play on center if possible, else on a corner
         gameContext.gameState.gameTurn === 2
       ) {
         if (gameContext.gameState.board[4] === '-') {
           playOnBoard(4);
         } else {
-          let corner = [0, 2, 6, 8]; // Index of all board corner
-          let move = Math.floor(Math.random() * corner.length + 1);
-          playOnBoard(corner[move]);
+          playOnBoard(corner[Math.floor(Math.random() * corner.length)]);
         }
         return;
       } else if (gameContext.gameState.gameTurn === 3) {
-        // if third, play on the same line from turn 1
-        if (firstMove === 0 || firstMove === 2) {
+        let firstMoveIndex = gameContext.gameState.board.findIndex(
+          (value) => value === gameContext.settingState.playerTwoSymbol
+        );
+        if (firstMoveIndex === 0 || firstMoveIndex === 2) {
           // 0 or 2 = play on first line
           for (let i = 0; i < 3; i++) {
             if (gameContext.gameState.board[i] === '-') {
+              console.log(i);
               playOnBoard(i);
+              return;
             }
           }
         } else {
+          console.log('là');
           for (let i = 6; i < 9; i++) {
             if (gameContext.gameState.board[i] === '-') {
+              console.log(i);
               playOnBoard(i);
+              return;
             }
           }
         }
@@ -71,8 +73,16 @@ export default React.memo(function Board() {
     }
   }, [gameContext.settingState, gameContext.gameState.playerTurn]);
 
+  const trackIaFirstMove = (firsMove) => {
+    const newGameState = { ...gameContext.gameState, iaFirstMove: firsMove };
+    console.log('ici');
+    console.log(newGameState);
+    gameContext.setGameState(newGameState);
+  };
+
   const playOnBoard = (index) => {
-    if (!gameContext.gameState.gameStart) {
+    console.log('là');
+    if (!gameContext.gameState.gameStarted) {
       return;
     }
     const symbol =
@@ -99,6 +109,18 @@ export default React.memo(function Board() {
           settings={gameContext.settingState}
           setSettings={gameContext.setSettingGameState}
         />
+      </div>
+      <div>
+        <p>
+          {gameContext.settingState.gameType === '1 player' ? 'Joueur 1 VS IA' : gameContext.settingState.gameType === '2 player' && 'Joueur 1 VS Joueur 2'}
+        </p>
+        <p>
+          {gameContext.settingState.firstPlayer === 0
+            ? 'Joueur 1 commence et joue ' + gameContext.settingState.playerOneSymbol
+            : gameContext.settingState.firstPlayer === 1
+            ? 'IA commence et joue ' + gameContext.settingState.playerTwoSymbol
+            : ''}
+        </p>
       </div>
       <table className='board'>
         <tbody>

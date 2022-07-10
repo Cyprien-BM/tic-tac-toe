@@ -11,6 +11,8 @@ export default memo(function Button(props) {
     btnsNames: 'players', // players or symbols selection
   };
 
+  console.log('btn');
+
   const [btnState, setBtnState] = useState(initialButtonState);
 
   const gameParameterSelection = (event) => {
@@ -29,7 +31,7 @@ export default memo(function Button(props) {
         modifyGameType(newSettingState, '1 player', firstPlayer)
       );
     } else {
-      props.setSettings(modifyGameType(newSettingState, '2 player'));
+      props.setSettings(modifyGameType(newSettingState, '2 player', 0));
     }
     switchButtonsToSymbol();
   };
@@ -64,9 +66,7 @@ export default memo(function Button(props) {
 
   const modifyGameType = (newSettingState, value, firstPlayer) => {
     newSettingState.gameType = value;
-    if (firstPlayer === 1) {
-      newSettingState.firstPlayer = firstPlayer;
-    }
+    newSettingState.firstPlayer = firstPlayer;
     console.log(newSettingState);
     return newSettingState;
   };
