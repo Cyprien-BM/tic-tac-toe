@@ -4,6 +4,7 @@ import { GameSettingContext } from '../../Context/GameSettingContext';
 import './Board.css';
 import ButtonSelection from '../ButtonsSelection/ButtonsSelection';
 import nextMove from '../../minimaxAlgo';
+import checkVictoryCondition from '../../checkVictory';
 
 export default React.memo(function Board() {
   const gameContext = useContext(GameSettingContext);
@@ -48,16 +49,13 @@ export default React.memo(function Board() {
           // 0 or 2 = play on first line
           for (let i = 0; i < 3; i++) {
             if (gameContext.gameState.board[i] === '-') {
-              console.log(i);
               playOnBoard(i);
               return;
             }
           }
         } else {
-          console.log('là');
           for (let i = 6; i < 9; i++) {
             if (gameContext.gameState.board[i] === '-') {
-              console.log(i);
               playOnBoard(i);
               return;
             }
@@ -75,15 +73,15 @@ export default React.memo(function Board() {
 
   const trackIaFirstMove = (firsMove) => {
     const newGameState = { ...gameContext.gameState, iaFirstMove: firsMove };
-    console.log('ici');
-    console.log(newGameState);
     gameContext.setGameState(newGameState);
   };
 
   const playOnBoard = (index) => {
-    console.log('là');
     if (!gameContext.gameState.gameStarted) {
       return;
+    }
+    if (checkVictoryCondition(gameContext.gameState.board)) {
+      return
     }
     const symbol =
       gameContext.gameState.playerTurn === 0
