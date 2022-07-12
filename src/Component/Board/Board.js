@@ -1,14 +1,10 @@
-import React, { useContext, useEffect, useState, useMemo, useRef } from 'react';
+import React, { useEffect } from 'react';
 import Tile from '../Tile/Tile';
 import './Board.css';
 import nextMove from '../../minimaxAlgo';
 import checkVictoryCondition from '../../checkVictory';
-import { useCallback } from 'react';
 
 export default function Board(props) {
-
-const ref = useRef()
-
   useEffect(() => {
     if (props.settingState.playerTwoSymbol) {
       console.log('ici');
@@ -88,13 +84,16 @@ const ref = useRef()
   };
 
   const playOnBoard = (index) => {
-    console.log('hello');
-    console.log(props.gameState);
-    console.log(props.settingState);
+    if (!props.gameState.gameStarted) {
+      return;
+    }
     if (
       checkVictoryCondition(props.gameState.board) ||
       props.gameState.gameTurn === 11
     ) {
+      return;
+    }
+    if (props.gameState.board[index] !== '-') {
       return;
     }
     const symbol =
@@ -119,7 +118,8 @@ const ref = useRef()
     playOnBoard(index);
   };
 
-  console.log(ref);
+  console.log(props.gameState.board[0]);
+  // console.log(props.gameState.board[0] !== '-');
 
   return (
     <>
@@ -142,20 +142,25 @@ const ref = useRef()
         <tbody>
           <tr id='first-row'>
             <Tile
-            ref={ref}
-              className={'tile left'}
+              className={
+                (props.gameState.board[0] === '-' && 'enabled') + ' tile left'
+              }
               value={props.gameState.board[0]}
               playOnBoard={playOnBoard}
               index={0}
             />
             <Tile
-              className={'tile center'}
+             className={
+                (props.gameState.board[0] === '-' && 'enabled') + ' tile center'
+              }
               value={props.gameState.board[1]}
               playOnBoard={playOnBoard}
               index={1}
             />
             <Tile
-              className={'tile right'}
+              className={
+                (props.gameState.board[0] === '-' && 'enabled') + ' tile right'
+              }
               value={props.gameState.board[2]}
               playOnBoard={playOnBoard}
               index={2}
@@ -163,19 +168,25 @@ const ref = useRef()
           </tr>
           <tr id='second-row'>
             <Tile
-              className={'tile left'}
+              className={
+                (props.gameState.board[0] === '-' && 'enabled') + ' tile left'
+              }
               value={props.gameState.board[3]}
               playOnBoard={playOnBoard}
               index={3}
             />
             <Tile
-              className={'tile center'}
+              className={
+                (props.gameState.board[0] === '-' && 'enabled') + ' tile center'
+              }
               value={props.gameState.board[4]}
               playOnBoard={playOnBoard}
               index={4}
             />
             <Tile
-              className={'tile right'}
+              className={
+                (props.gameState.board[0] === '-' && 'enabled') + ' tile right'
+              }
               value={props.gameState.board[5]}
               playOnBoard={playOnBoard}
               index={5}
@@ -183,19 +194,25 @@ const ref = useRef()
           </tr>
           <tr id='third-row'>
             <Tile
-              className={'tile left'}
+              className={
+                (props.gameState.board[0] === '-' && 'enabled') + ' tile left'
+              }
               value={props.gameState.board[6]}
               playOnBoard={playOnBoard}
               index={6}
             />
             <Tile
-              className={'tile center'}
+              className={
+                (props.gameState.board[0] === '-' && 'enabled') + ' tile center'
+              }
               value={props.gameState.board[7]}
               playOnBoard={playOnBoard}
               index={7}
             />
             <Tile
-              className={'tile right'}
+              className={
+                (props.gameState.board[0] === '-' && 'enabled') + ' tile right'
+              }
               value={props.gameState.board[8]}
               playOnBoard={playOnBoard}
               index={8}
