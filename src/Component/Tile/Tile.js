@@ -1,12 +1,18 @@
 import React from 'react';
 
-export default React.memo(function Tile(props) {
-  return (
-    <td
-      className={props.className}
-      onClick={() => props.playOnBoard(props.index)}
-    >
-      {props.value !== '-' ? props.value : ''}
-    </td>
-  );
-});
+export default class Tile extends React.Component {
+  shouldComponentUpdate(nextProps) {
+    return this.props.value !== nextProps.value;
+  }
+
+  render() {
+    return (
+      <td
+        className={this.props.className}
+        onClick={() => this.props.playOnBoard(this.props.index)}
+      >
+        {this.props.value !== '-' ? this.props.value : ''}
+      </td>
+    );
+  }
+}

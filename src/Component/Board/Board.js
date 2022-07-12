@@ -1,61 +1,72 @@
-import React, { useContext, useEffect, useState } from 'react';
+import React, { useContext, useEffect, useState, useMemo, useRef } from 'react';
 import Tile from '../Tile/Tile';
-import { GameSettingContext } from '../../Context/GameSettingContext';
 import './Board.css';
-import ButtonSelection from '../ButtonsSelection/ButtonsSelection';
 import nextMove from '../../minimaxAlgo';
 import checkVictoryCondition from '../../checkVictory';
+import { useCallback } from 'react';
 
-export default React.memo(function Board() {
-  const gameContext = useContext(GameSettingContext);
+export default function Board(props) {
+
+const ref = useRef()
 
   useEffect(() => {
-    if (gameContext.settingState.playerTwoSymbol) {
+    if (props.settingState.playerTwoSymbol) {
+      console.log('ici');
       const newGameState = {
-        ...gameContext.gameState,
-        playerTurn: gameContext.settingState.firstPlayer,
+        ...props.gameState,
+        playerTurn: props.settingState.firstPlayer,
         gameStarted: true,
       };
-      gameContext.setGameState(newGameState);
+      props.setGameState(newGameState);
     }
-  }, [gameContext.settingState]);
+  }, [props.settingState]);
+
+  console.log('board rerender');
+  console.log(props.gameState);
+  console.log(props.settingState);
 
   // Determine IA Move
   let corner = [0, 2, 6, 8]; // Index of all board corner
   useEffect(() => {
     if (
-      gameContext.settingState.gameType === '1 player' &&
-      gameContext.gameState.playerTurn === 1
+      checkVictoryCondition(props.gameState.board) ||
+      props.gameState.gameTurn === 10
     ) {
-      if (gameContext.gameState.gameTurn === 1) {
+      return;
+    }
+    if (
+      props.settingState.gameType === '1 player' &&
+      props.gameState.playerTurn === 1
+    ) {
+      if (props.gameState.gameTurn === 1) {
         // if first : play on a random corner
         playOnBoard(corner[Math.floor(Math.random() * corner.length)]);
         return;
       } else if (
         // if second : play on center if possible, else on a corner
-        gameContext.gameState.gameTurn === 2
+        props.gameState.gameTurn === 2
       ) {
-        if (gameContext.gameState.board[4] === '-') {
+        if (props.gameState.board[4] === '-') {
           playOnBoard(4);
         } else {
           playOnBoard(corner[Math.floor(Math.random() * corner.length)]);
         }
         return;
-      } else if (gameContext.gameState.gameTurn === 3) {
-        let firstMoveIndex = gameContext.gameState.board.findIndex(
-          (value) => value === gameContext.settingState.playerTwoSymbol
+      } else if (props.gameState.gameTurn === 3) {
+        let firstMoveIndex = props.gameState.board.findIndex(
+          (value) => value === props.settingState.playerTwoSymbol
         );
         if (firstMoveIndex === 0 || firstMoveIndex === 2) {
           // 0 or 2 = play on first line
           for (let i = 0; i < 3; i++) {
-            if (gameContext.gameState.board[i] === '-') {
+            if (props.gameState.board[i] === '-') {
               playOnBoard(i);
               return;
             }
           }
         } else {
           for (let i = 6; i < 9; i++) {
-            if (gameContext.gameState.board[i] === '-') {
+            if (props.gameState.board[i] === '-') {
               playOnBoard(i);
               return;
             }
@@ -63,60 +74,67 @@ export default React.memo(function Board() {
         }
       }
       let iaMove = nextMove(
-        gameContext.gameState.board,
-        gameContext.settingState.playerTwoSymbol,
-        gameContext.settingState.playerOneSymbol
+        props.gameState.board,
+        props.settingState.playerTwoSymbol,
+        props.settingState.playerOneSymbol
       );
       playOnBoard(iaMove);
     }
-  }, [gameContext.settingState, gameContext.gameState.playerTurn]);
+  }, [props.settingState, props.gameState.playerTurn]);
 
   const trackIaFirstMove = (firsMove) => {
-    const newGameState = { ...gameContext.gameState, iaFirstMove: firsMove };
-    gameContext.setGameState(newGameState);
+    const newGameState = { ...props.gameState, iaFirstMove: firsMove };
+    props.setGameState(newGameState);
   };
 
   const playOnBoard = (index) => {
-    if (!gameContext.gameState.gameStarted) {
+    console.log('hello');
+    console.log(props.gameState);
+    console.log(props.settingState);
+    if (
+      checkVictoryCondition(props.gameState.board) ||
+      props.gameState.gameTurn === 11
+    ) {
       return;
     }
-    if (checkVictoryCondition(gameContext.gameState.board)) {
-      return
-    }
     const symbol =
-      gameContext.gameState.playerTurn === 0
-        ? gameContext.settingState.playerOneSymbol
-        : gameContext.settingState.playerTwoSymbol;
-    const newBoard = [...gameContext.gameState.board];
+      props.gameState.playerTurn === 0
+        ? props.settingState.playerOneSymbol
+        : props.settingState.playerTwoSymbol;
+    const newBoard = [...props.gameState.board];
     newBoard[index] = symbol;
-    const newPlayer = 1 - gameContext.gameState.playerTurn;
-    const newTurn = 1 + gameContext.gameState.gameTurn;
+    const newPlayer = 1 - props.gameState.playerTurn;
+    const newTurn = 1 + props.gameState.gameTurn;
     const NewGameState = {
-      ...gameContext.gameState,
+      ...props.gameState,
       board: newBoard,
       playerTurn: newPlayer,
       gameTurn: newTurn,
     };
-    gameContext.setGameState(NewGameState);
+    props.setGameState(NewGameState);
   };
+
+  const handleClickOnTile = (index) => {
+    console.log('click');
+    playOnBoard(index);
+  };
+
+  console.log(ref);
 
   return (
     <>
       <div>
-        <ButtonSelection
-          settings={gameContext.settingState}
-          setSettings={gameContext.setSettingGameState}
-        />
-      </div>
-      <div>
         <p>
-          {gameContext.settingState.gameType === '1 player' ? 'Joueur 1 VS IA' : gameContext.settingState.gameType === '2 player' && 'Joueur 1 VS Joueur 2'}
+          {props.settingState.gameType === '1 player'
+            ? 'Joueur 1 VS IA'
+            : props.settingState.gameType === '2 player' &&
+              'Joueur 1 VS Joueur 2'}
         </p>
         <p>
-          {gameContext.settingState.firstPlayer === 0
-            ? 'Joueur 1 commence et joue ' + gameContext.settingState.playerOneSymbol
-            : gameContext.settingState.firstPlayer === 1
-            ? 'IA commence et joue ' + gameContext.settingState.playerTwoSymbol
+          {props.settingState.firstPlayer === 0
+            ? 'Joueur 1 commence et joue ' + props.settingState.playerOneSymbol
+            : props.settingState.firstPlayer === 1
+            ? 'IA commence et joue ' + props.settingState.playerTwoSymbol
             : ''}
         </p>
       </div>
@@ -124,20 +142,21 @@ export default React.memo(function Board() {
         <tbody>
           <tr id='first-row'>
             <Tile
+            ref={ref}
               className={'tile left'}
-              value={gameContext.gameState.board[0]}
+              value={props.gameState.board[0]}
               playOnBoard={playOnBoard}
               index={0}
             />
             <Tile
               className={'tile center'}
-              value={gameContext.gameState.board[1]}
+              value={props.gameState.board[1]}
               playOnBoard={playOnBoard}
               index={1}
             />
             <Tile
               className={'tile right'}
-              value={gameContext.gameState.board[2]}
+              value={props.gameState.board[2]}
               playOnBoard={playOnBoard}
               index={2}
             />
@@ -145,19 +164,19 @@ export default React.memo(function Board() {
           <tr id='second-row'>
             <Tile
               className={'tile left'}
-              value={gameContext.gameState.board[3]}
+              value={props.gameState.board[3]}
               playOnBoard={playOnBoard}
               index={3}
             />
             <Tile
               className={'tile center'}
-              value={gameContext.gameState.board[4]}
+              value={props.gameState.board[4]}
               playOnBoard={playOnBoard}
               index={4}
             />
             <Tile
               className={'tile right'}
-              value={gameContext.gameState.board[5]}
+              value={props.gameState.board[5]}
               playOnBoard={playOnBoard}
               index={5}
             />
@@ -165,19 +184,19 @@ export default React.memo(function Board() {
           <tr id='third-row'>
             <Tile
               className={'tile left'}
-              value={gameContext.gameState.board[6]}
+              value={props.gameState.board[6]}
               playOnBoard={playOnBoard}
               index={6}
             />
             <Tile
               className={'tile center'}
-              value={gameContext.gameState.board[7]}
+              value={props.gameState.board[7]}
               playOnBoard={playOnBoard}
               index={7}
             />
             <Tile
               className={'tile right'}
-              value={gameContext.gameState.board[8]}
+              value={props.gameState.board[8]}
               playOnBoard={playOnBoard}
               index={8}
             />
@@ -186,4 +205,4 @@ export default React.memo(function Board() {
       </table>
     </>
   );
-});
+}

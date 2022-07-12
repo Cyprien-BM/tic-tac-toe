@@ -1,5 +1,5 @@
 import React, { useState, useRef, memo, useEffect } from 'react';
-import './ButtonsSelection.css';
+import './SettingsButtons.css';
 
 export default memo(function Button(props) {
   const buttonOne = useRef();
@@ -10,8 +10,6 @@ export default memo(function Button(props) {
     btnTwo: '2 joueur', // btOne = 2 player and then O symbol
     btnsNames: 'players', // players or symbols selection
   };
-
-  console.log('btn');
 
   const [btnState, setBtnState] = useState(initialButtonState);
 
@@ -67,7 +65,6 @@ export default memo(function Button(props) {
   const modifyGameType = (newSettingState, value, firstPlayer) => {
     newSettingState.gameType = value;
     newSettingState.firstPlayer = firstPlayer;
-    console.log(newSettingState);
     return newSettingState;
   };
 
